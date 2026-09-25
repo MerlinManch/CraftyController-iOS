@@ -1,0 +1,48 @@
+name: Unsigned iOS IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build iPhone app without signing
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project CraftyNative.xcodeproj \
+            -scheme CraftyNative \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/CraftyBuild" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          app="$RUNNER_TEMP/CraftyBuild/Build/Products/Release-iphoneos/CraftyNative.app"
+          test -d "$app"
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          ditto "$app" "$RUNNER_TEMP/ipa/Payload/CraftyNative.app"
+          (cd "$RUNNER_TEMP/ipa" && zip -qry "$GITHUB_WORKSPACE/CraftyNative-unsigned.ipa" Payload)
+          test -s CraftyNative-unsigned.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: CraftyNative-unsigned-ipa
+          path: CraftyNative-unsigned.ipa
+          if-no-files-found: error

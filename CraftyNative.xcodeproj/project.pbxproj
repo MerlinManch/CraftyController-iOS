@@ -1,0 +1,82 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1;
+ classes = {};
+ objectVersion = 56;
+ objects = {
+/* Begin PBXBuildFile section */
+		05F0433DE65E5D8B494D5A99 /* build_API.swift */ = { isa = PBXBuildFile; fileRef = 1E106333A2545FEA38E6A254 /* API.swift */ };
+		2B674417DE8B20569A1107E4 /* build_CraftyNativeApp.swift */ = { isa = PBXBuildFile; fileRef = F4EECDEF181071261F29C1FC /* CraftyNativeApp.swift */ };
+		E19770F95DEFFA3284D186FD /* build_FilesView.swift */ = { isa = PBXBuildFile; fileRef = E4FE312E83D9A7F30C779AE6 /* FilesView.swift */ };
+		FC846189D272CC006FF49B14 /* build_ManagementViews.swift */ = { isa = PBXBuildFile; fileRef = 9AD96731CF5BA59B65E115E1 /* ManagementViews.swift */ };
+		90EC0460E9A992A1A33E0FA2 /* build_RootView.swift */ = { isa = PBXBuildFile; fileRef = 91E89779A0DFB88B8147A7F2 /* RootView.swift */ };
+		A4AF58279D76F71273299CE1 /* build_ServerViews.swift */ = { isa = PBXBuildFile; fileRef = CCE02975C824E6B062B0A7BC /* ServerViews.swift */ };
+		F21E29704BF3DB287740DA93 /* build_Session.swift */ = { isa = PBXBuildFile; fileRef = B72BA458FDEA867026ADA6DC /* Session.swift */ };
+		9728FCF5BFD75018EDD71EE1 /* build_Theme.swift */ = { isa = PBXBuildFile; fileRef = 483FF22CF119BDB79BEA4DF4 /* Theme.swift */ };
+		6F939E33CE49FD56C82E6D22 /* BackupsView.swift */ = { isa = PBXBuildFile; fileRef = CCE4F0017B637AE7A19E76CB /* BackupsView.swift */; };
+/* End PBXBuildFile section */
+/* Begin PBXFileReference section */
+		1E106333A2545FEA38E6A254 /* ref_API.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>" };
+		F4EECDEF181071261F29C1FC /* ref_CraftyNativeApp.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CraftyNativeApp.swift; sourceTree = "<group>" };
+		E4FE312E83D9A7F30C779AE6 /* ref_FilesView.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesView.swift; sourceTree = "<group>" };
+		9AD96731CF5BA59B65E115E1 /* ref_ManagementViews.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementViews.swift; sourceTree = "<group>" };
+		91E89779A0DFB88B8147A7F2 /* ref_RootView.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>" };
+		CCE02975C824E6B062B0A7BC /* ref_ServerViews.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerViews.swift; sourceTree = "<group>" };
+		B72BA458FDEA867026ADA6DC /* ref_Session.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>" };
+		483FF22CF119BDB79BEA4DF4 /* ref_Theme.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>" };
+		38A007151ABE87CC01A5B6E9 /* CraftyNative.app */ = { isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CraftyNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CCE4F0017B637AE7A19E76CB /* BackupsView.swift */ = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+/* Begin PBXFrameworksBuildPhase section */
+		7561BFB015D8F536760CB671 /* Frameworks */ = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+/* Begin PBXGroup section */
+		DC76E9F0C0006E8F919E0C51 = { isa = PBXGroup; children = (482182478A3ECD4745BEA917 /* CraftyNative */, FBDC4F23F93125BBEEAE800C /* Products */); sourceTree = "<group>"; };
+		482182478A3ECD4745BEA917 /* CraftyNative */ = { isa = PBXGroup; children = (
+				CCE4F0017B637AE7A19E76CB /* BackupsView.swift */,
+				1E106333A2545FEA38E6A254 /* API.swift */,
+				F4EECDEF181071261F29C1FC /* CraftyNativeApp.swift */,
+				E4FE312E83D9A7F30C779AE6 /* FilesView.swift */,
+				9AD96731CF5BA59B65E115E1 /* ManagementViews.swift */,
+				91E89779A0DFB88B8147A7F2 /* RootView.swift */,
+				CCE02975C824E6B062B0A7BC /* ServerViews.swift */,
+				B72BA458FDEA867026ADA6DC /* Session.swift */,
+				483FF22CF119BDB79BEA4DF4 /* Theme.swift */
+			); path = CraftyNative; sourceTree = "<group>"; };
+		FBDC4F23F93125BBEEAE800C /* Products */ = { isa = PBXGroup; children = (38A007151ABE87CC01A5B6E9 /* CraftyNative.app */); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+/* Begin PBXNativeTarget section */
+		0E8A3AD980EC179856012B7E /* CraftyNative */ = { isa = PBXNativeTarget; buildConfigurationList = 4FE71F2A87991572F562EAA3 /* Build configuration list for PBXNativeTarget "CraftyNative" */; buildPhases = (BCE16DD0260827ECF338C787 /* Sources */, 7561BFB015D8F536760CB671 /* Frameworks */, 0189424A5A60FED329FA868E /* Resources */); buildRules = (); dependencies = (); name = CraftyNative; productName = CraftyNative; productReference = 38A007151ABE87CC01A5B6E9 /* CraftyNative.app */; productType = "com.apple.product-type.application"; };
+/* End PBXNativeTarget section */
+/* Begin PBXProject section */
+		98F54143AB4E86B28C3AFEE0 /* Project object */ = { isa = PBXProject; attributes = { BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 1500; TargetAttributes = { 0E8A3AD980EC179856012B7E = { CreatedOnToolsVersion = 15.0; }; }; }; buildConfigurationList = BC7E287B75C6D3E574547D08 /* Build configuration list for PBXProject "CraftyNative" */; compatibilityVersion = "Xcode 15.0"; developmentRegion = de; hasScannedForEncodings = 0; knownRegions = (de, en, Base); mainGroup = DC76E9F0C0006E8F919E0C51; productRefGroup = FBDC4F23F93125BBEEAE800C; projectDirPath = ""; projectRoot = ""; targets = (0E8A3AD980EC179856012B7E /* CraftyNative */); };
+/* End PBXProject section */
+/* Begin PBXResourcesBuildPhase section */
+		0189424A5A60FED329FA868E /* Resources */ = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+/* Begin PBXSourcesBuildPhase section */
+		BCE16DD0260827ECF338C787 /* Sources */ = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
+				6F939E33CE49FD56C82E6D22 /* BackupsView.swift */,
+				05F0433DE65E5D8B494D5A99 /* API.swift */,
+				2B674417DE8B20569A1107E4 /* CraftyNativeApp.swift */,
+				E19770F95DEFFA3284D186FD /* FilesView.swift */,
+				FC846189D272CC006FF49B14 /* ManagementViews.swift */,
+				90EC0460E9A992A1A33E0FA2 /* RootView.swift */,
+				A4AF58279D76F71273299CE1 /* ServerViews.swift */,
+				F21E29704BF3DB287740DA93 /* Session.swift */,
+				9728FCF5BFD75018EDD71EE1 /* Theme.swift */
+			); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+/* Begin XCBuildConfiguration section */
+		E5FAE1233D982CF4928FD0DB /* Debug */ = { isa = XCBuildConfiguration; buildSettings = { CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = dwarf; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_VERSION = 5.9; }; name = Debug; };
+		9CE61C30A4C338AC9340D41A /* Release */ = { isa = XCBuildConfiguration; buildSettings = { CLANG_ENABLE_MODULES = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_VERSION = 5.9; }; name = Release; };
+		989E76A6E3D459B163A3B3E5 /* Debug */ = { isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = CraftyNative/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = com.example.CraftyNative; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.9; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		1A927C84DB41E6F3C3070F30 /* Release */ = { isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = CraftyNative/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = com.example.CraftyNative; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_VERSION = 5.9; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+/* End XCBuildConfiguration section */
+/* Begin XCConfigurationList section */
+		BC7E287B75C6D3E574547D08 = { isa = XCConfigurationList; buildConfigurations = (E5FAE1233D982CF4928FD0DB /* Debug */, 9CE61C30A4C338AC9340D41A /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		4FE71F2A87991572F562EAA3 = { isa = XCConfigurationList; buildConfigurations = (989E76A6E3D459B163A3B3E5 /* Debug */, 1A927C84DB41E6F3C3070F30 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+ };
+ rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
+}
