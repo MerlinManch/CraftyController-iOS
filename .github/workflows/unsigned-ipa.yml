@@ -35,6 +35,9 @@ jobs:
           set -euo pipefail
           app="$RUNNER_TEMP/CraftyBuild/Build/Products/Release-iphoneos/CraftyNative.app"
           test -d "$app"
+          executable=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Info.plist")
+          test -n "$executable"
+          test -x "$app/$executable"
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
           ditto "$app" "$RUNNER_TEMP/ipa/Payload/CraftyNative.app"
           (cd "$RUNNER_TEMP/ipa" && zip -qry "$GITHUB_WORKSPACE/CraftyNative-unsigned.ipa" Payload)
