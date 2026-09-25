@@ -188,7 +188,7 @@ struct WorkspaceView: View {
     @EnvironmentObject private var session: SessionStore
     @State private var method = "GET"
     @State private var route = "servers"
-    @State private var body = "{}"
+    @State private var payloadText = "{}"
     @State private var response = ""
     @State private var error: String?
     @State private var busy = false
@@ -205,7 +205,7 @@ struct WorkspaceView: View {
                     .textInputAutocapitalization(.never).autocorrectionDisabled()
                 if method != "GET" && method != "DELETE" {
                     Text("JSON-Inhalt").font(.caption).foregroundStyle(.secondary)
-                    TextEditor(text: $body).font(.system(.subheadline, design: .monospaced))
+                    TextEditor(text: $payloadText).font(.system(.subheadline, design: .monospaced))
                         .frame(minHeight: 120)
                 }
                 Button {
@@ -238,7 +238,7 @@ struct WorkspaceView: View {
         busy = true
         defer { busy = false }
         do {
-            let payload = (method == "GET" || method == "DELETE") ? nil : try JSONValue.parse(body)
+            let payload = (method == "GET" || method == "DELETE") ? nil : try JSONValue.parse(payloadText)
             response = try await api.request(method, route, body: payload).pretty
             error = nil
         } catch { self.error = error.localizedDescription }
