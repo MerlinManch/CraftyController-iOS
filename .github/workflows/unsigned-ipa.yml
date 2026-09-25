@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      bundle_identifier:
+        description: Bundle-ID passend zum App-ID-Eintrag des Provisioning-Profils
+        required: true
+        type: string
+        default: com.example.CraftyNative
 
 permissions:
   contents: read
@@ -17,8 +23,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build iPhone app without signing
+        env:
+          BUNDLE_IDENTIFIER: ${{ inputs.bundle_identifier || 'com.example.CraftyNative' }}
         run: |
           set -euo pipefail
+          [[ "$BUNDLE_IDENTIFIER" =~ ^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$ ]] || { echo 'Ungültige Bundle-ID'; exit 1; }
           xcodebuild \
             -project CraftyNative.xcodeproj \
             -scheme CraftyNative \
@@ -26,6 +35,7 @@ jobs:
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -derivedDataPath "$RUNNER_TEMP/CraftyBuild" \
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             build
