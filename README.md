@@ -8,6 +8,8 @@ Open `CraftyNative.xcodeproj` with Xcode 15 or newer, choose an iPhone simulator
 
 The GitHub Actions workflow **Unsigned iOS IPA** runs on each push to `main` and can also be started manually. Download its `CraftyNative-unsigned-ipa` artifact from the run page. This IPA has no signature or provisioning profile and must be signed before installation on an ordinary iPhone.
 
+For installation steps, see [INSTALLATION.md](INSTALLATION.md).
+
 Connect to an HTTPS Crafty Controller 4 instance with a trusted certificate. In Crafty, create an API key for your user with the permissions required for the operations you want, then enter the instance URL and key in the app. Username/password login is also supported when the instance permits API login. Credentials are stored in the iOS Keychain. A publicly trusted certificate or an explicitly trusted private CA is required; certificate validation is never disabled.
 
 ## Coverage
