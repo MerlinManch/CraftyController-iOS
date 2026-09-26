@@ -10,6 +10,24 @@ struct ServerDetailView: View {
 
     private var id: String { server.serverID }
     private var running: Bool { stats?["running"]?.boolean ?? server.isRunning }
+    private var cpuValue: String {
+        guard let cpu = stats?["cpu"]?.numeric else { return "–" }
+        return String(format: "%.1f %%", cpu)
+    }
+    private var memoryValue: String {
+        guard let raw = stats?["mem"]?.text ?? stats?["memory"]?.text else { return "–" }
+        let value = Double(raw.prefix { $0.isNumber || $0 == "." || $0 == "," }.replacingOccurrences(of: ",", with: "."))
+        guard let value else { return raw }
+        let upper = raw.uppercased()
+        let gigabytes: Double
+        if upper.contains("GIB") || upper.contains("GB") { gigabytes = value }
+        else if upper.contains("MIB") { gigabytes = value / 1024 }
+        else if upper.contains("MB") { gigabytes = value / 1000 }
+        else if upper.contains("KIB") { gigabytes = value / (1024 * 1024) }
+        else if upper.contains("KB") { gigabytes = value / 1_000_000 }
+        else { gigabytes = value / 1_000_000_000 }
+        return String(format: "%.2f GB", gigabytes)
+    }
 
     var body: some View {
         ScrollView {
@@ -27,8 +45,8 @@ struct ServerDetailView: View {
                 if let error { ErrorNotice(message: error) }
                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
                     MetricTile(title: "Spieler", value: stats?["online"]?.text ?? stats?["players"]?.text ?? "–", icon: "person.2.fill")
-                    MetricTile(title: "CPU", value: stats?["cpu"]?.text ?? "–", icon: "cpu")
-                    MetricTile(title: "Speicher", value: stats?["mem"]?.text ?? stats?["memory"]?.text ?? "–", icon: "memorychip")
+                    MetricTile(title: "CPU", value: cpuValue, icon: "cpu")
+                    MetricTile(title: "Speicher", value: memoryValue, icon: "memorychip")
                     MetricTile(title: "Version", value: stats?["version"]?.text ?? "–", icon: "shippingbox")
                 }
                 HStack(spacing: 10) {
@@ -54,11 +72,11 @@ struct ServerDetailView: View {
                     }
                     Divider().padding(.leading, 54)
                     destination("Zeitpläne", icon: "calendar.badge.clock", detail: "Automatische Aufgaben") {
-                        ResourceView(title: "Zeitpläne", route: "servers/\(id)/tasks", icon: "calendar.badge.clock")
+                        SchedulesView(serverID: id)
                     }
                     Divider().padding(.leading, 54)
                     destination("Webhooks", icon: "bell.badge", detail: "Benachrichtigungen") {
-                        ResourceView(title: "Webhooks", route: "servers/\(id)/webhooks", icon: "bell.badge")
+                        ResourceView(title: "Webhooks", route: "servers/\(id)/webhook", icon: "bell.badge")
                     }
                     Divider().padding(.leading, 54)
                     destination("Servereinstellungen", icon: "gearshape", detail: "Konfiguration und Rechte") {
@@ -161,9 +179,15 @@ struct ConsoleView: View {
     private func refresh() async {
         guard let api = session.api else { return }
         do {
-            let result = try await api.request("GET", "servers/\(serverID)/logs")
-            if case .array(let items) = result { lines = items.map(\.text).joined(separator: "\n") }
-            else { lines = result["logs"]?.items.map(\.text).joined(separator: "\n") ?? result["logs"]?.text ?? result.text }
+            let result = try await api.request("GET", "servers/\(serverID)/logs?colors=false&raw=false&html=false")
+            func logLines(_ value: JSONValue) -> [String] {
+                switch value {
+                case .array(let entries): return entries.flatMap(logLines)
+                case .string(let line): return [line]
+                default: return []
+                }
+            }
+            lines = logLines(result["logs"] ?? result).joined(separator: "\n")
             error = nil
         } catch { self.error = error.localizedDescription }
     }
@@ -175,9 +199,34 @@ struct ConsoleView: View {
         sending = true
         defer { sending = false }
         do {
-            _ = try await api.request("POST", "servers/\(serverID)/action/send_command", body: .object(["command": .string(value)]))
+            _ = try await api.raw("POST", "servers/\(serverID)/stdin", plainText: value)
             command = ""
             await refresh()
         } catch { self.error = error.localizedDescription }
+    }
+}
+
+struct SchedulesView: View {
+    let serverID: String
+
+    var body: some View {
+        List {
+            Section {
+                Label("Crafty stellt über seine API derzeit keine funktionierende Liste der Zeitpläne bereit. Der GET-Aufruf endet im Crafty-Handler mit einem Serverfehler.", systemImage: "info.circle")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Section("Neuen Zeitplan erstellen") {
+                NavigationLink {
+                    JSONEditorView(title: "Zeitplan erstellen", route: "servers/\(serverID)/tasks",
+                                   initial: .object(["name": .string(""), "enabled": .bool(true),
+                                                     "action": .string(""), "interval": .number(1),
+                                                     "interval_type": .string("hours"),
+                                                     "start_time": .string("00:00"), "one_time": .bool(false)]),
+                                   method: "POST")
+                } label: { Label("Zeitplan konfigurieren", systemImage: "calendar.badge.plus") }
+            }
+        }
+        .navigationTitle("Zeitpläne")
     }
 }

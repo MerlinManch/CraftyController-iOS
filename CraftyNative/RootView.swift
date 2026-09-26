@@ -17,6 +17,8 @@ private struct ConnectionView: View {
     @State private var token = ""
     @State private var username = ""
     @State private var password = ""
+    @State private var secondFactor = ""
+    @State private var useBackupCode = false
     @State private var useToken = true
 
     var body: some View {
@@ -50,6 +52,15 @@ private struct ConnectionView: View {
                             TextField("Benutzername", text: $username).textContentType(.username)
                             Divider()
                             SecureField("Passwort", text: $password).textContentType(.password)
+                            Divider()
+                            Toggle("Backup-Code verwenden", isOn: $useBackupCode)
+                            if useBackupCode {
+                                TextField("Backup-Code", text: $secondFactor)
+                                    .textInputAutocapitalization(.never).autocorrectionDisabled()
+                            } else {
+                                TextField("6-stelliger 2FA-Code (falls aktiviert)", text: $secondFactor)
+                                    .keyboardType(.numberPad).textContentType(.oneTimeCode)
+                            }
                         }
                     }
                     .padding(18)
@@ -58,7 +69,9 @@ private struct ConnectionView: View {
                     Button {
                         Task {
                             if useToken { await session.connect(address: address, token: token) }
-                            else { await session.login(address: address, username: username, password: password) }
+                            else { await session.login(address: address, username: username, password: password,
+                                                       totp: useBackupCode ? "" : secondFactor,
+                                                       backupCode: useBackupCode ? secondFactor : "") }
                         }
                     } label: {
                         HStack {
@@ -136,7 +149,11 @@ private struct DashboardView: View {
                                     .font(.caption).foregroundStyle(.secondary).lineLimit(1)
                             }
                             Spacer(minLength: 0)
-                            StatusPill(running: server.isRunning)
+                            if server["running"] != nil || server["stats"]?["running"] != nil {
+                                StatusPill(running: server.isRunning)
+                            } else {
+                                Text("Status unbekannt").font(.caption).foregroundStyle(.secondary)
+                            }
                         }.padding(.vertical, 6)
                     }
                 }
@@ -160,7 +177,7 @@ private struct AdministrationView: View {
             Section("Crafty") {
                 NavigationLink { ResourceView(title: "Benutzer", route: "users", icon: "person.2") } label: { Label("Benutzer", systemImage: "person.2") }
                 NavigationLink { ResourceView(title: "Rollen", route: "roles", icon: "person.badge.key") } label: { Label("Rollen & Rechte", systemImage: "person.badge.key") }
-                NavigationLink { ResourceView(title: "Einstellungen", route: "crafty", icon: "gearshape") } label: { Label("Systemeinstellungen", systemImage: "gearshape") }
+                NavigationLink { ResourceView(title: "Einstellungen", route: "crafty/config", icon: "gearshape") } label: { Label("Systemeinstellungen", systemImage: "gearshape") }
             }
             Section {
                 Text("Die angezeigten Aktionen hängen von deinen Crafty-Berechtigungen ab.")

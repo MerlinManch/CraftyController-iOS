@@ -47,7 +47,17 @@ enum JSONValue: Codable, Equatable, Hashable {
     }
 
     var boolean: Bool {
-        switch self { case .bool(let v): return v; case .number(let v): return v != 0; default: return false }
+        switch self { case .bool(let v): return v; case .number(let v): return v != 0; case .string(let v): return ["true", "1", "online", "running"].contains(v.lowercased()); default: return false }
+    }
+
+    var numeric: Double? {
+        switch self { case .number(let v): return v; case .string(let v): return Double(v); default: return nil }
+    }
+
+    func setting(_ key: String, to value: JSONValue) -> JSONValue {
+        guard case .object(var fields) = self else { return self }
+        fields[key] = value
+        return .object(fields)
     }
 
     var pretty: String {
@@ -96,12 +106,16 @@ struct CraftyAPI {
         if data.isEmpty { return .null }
         guard let decoded = try? JSONDecoder().decode(JSONValue.self, from: data) else { throw APIError.badResponse }
         if decoded["status"]?.text.lowercased() == "error" {
-            throw APIError.application(decoded["error"]?["message"]?.text ?? decoded["error"]?.text ?? decoded["message"]?.text ?? "Crafty hat die Anfrage abgelehnt.")
+            throw APIError.application(decoded["error_data"]?.text ?? decoded["error"]?["message"]?.text ?? decoded["error"]?.text ?? decoded["message"]?.text ?? "Crafty hat die Anfrage abgelehnt.")
         }
         return decoded["data"] ?? decoded
     }
 
     func raw(_ method: String = "GET", _ route: String, body: JSONValue? = nil) async throws -> Data {
+        try await raw(method, route, body: body, plainText: nil)
+    }
+
+    func raw(_ method: String, _ route: String, body: JSONValue? = nil, plainText: String?) async throws -> Data {
         let rawRoute = route.hasPrefix("/") ? String(route.dropFirst()) : route
         let cleaned = rawRoute.hasPrefix("api/v2/") ? String(rawRoute.dropFirst(7)) : rawRoute
         guard !cleaned.contains("#"), !cleaned.contains("\\"), !cleaned.hasPrefix("//"),
@@ -113,7 +127,10 @@ struct CraftyAPI {
         request.timeoutInterval = 25
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        if let body {
+        if let plainText {
+            request.httpBody = Data(plainText.utf8)
+            request.setValue("text/plain; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        } else if let body {
             request.httpBody = try JSONEncoder().encode(body)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
@@ -121,15 +138,18 @@ struct CraftyAPI {
         guard let response = response as? HTTPURLResponse else { throw APIError.badResponse }
         guard (200...299).contains(response.statusCode) else {
             let decoded = try? JSONDecoder().decode(JSONValue.self, from: data)
-            let message = decoded?["error"]?["message"]?.text ?? decoded?["message"]?.text ?? String(decoding: data.prefix(250), as: UTF8.self)
+            let message = decoded?["error_data"]?.text ?? decoded?["error"]?["message"]?.text ?? decoded?["message"]?.text ?? decoded?["error"]?.text ?? String(decoding: data.prefix(250), as: UTF8.self)
             throw APIError.server(response.statusCode, message)
         }
         return data
     }
 
-    static func login(address: String, username: String, password: String) async throws -> String {
+    static func login(address: String, username: String, password: String, totp: String = "", backupCode: String = "") async throws -> String {
         let api = try CraftyAPI(address: address, token: "")
-        let result = try await api.request("POST", "auth/login", body: .object(["username": .string(username), "password": .string(password)]))
+        var credentials: [String: JSONValue] = ["username": .string(username), "password": .string(password)]
+        if !totp.isEmpty { credentials["totp"] = .string(totp.trimmingCharacters(in: .whitespacesAndNewlines)) }
+        if !backupCode.isEmpty { credentials["backup_code"] = .string(backupCode.trimmingCharacters(in: .whitespacesAndNewlines)) }
+        let result = try await api.request("POST", "auth/login", body: .object(credentials))
         guard let token = result["token"]?.text ?? result["access_token"]?.text, !token.isEmpty else { throw APIError.invalidCredentials }
         return token
     }

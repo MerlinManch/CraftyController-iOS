@@ -25,20 +25,20 @@ final class SessionStore: ObservableObject {
             let list = response.items.isEmpty ? response["servers"]?.items ?? [] : response.items
             self.api = candidate
             self.address = candidate.baseURL.absoluteString
-            self.servers = list
+            self.servers = await enrichedServers(list, api: candidate)
             KeychainStore.save(address: self.address, token: candidate.token)
         } catch { self.error = error.localizedDescription }
     }
 
-    func login(address: String, username: String, password: String) async {
+    func login(address: String, username: String, password: String, totp: String = "", backupCode: String = "") async {
         busy = true
         error = nil
         defer { busy = false }
         do {
-            let token = try await CraftyAPI.login(address: address, username: username, password: password)
+            let token = try await CraftyAPI.login(address: address, username: username, password: password, totp: totp, backupCode: backupCode)
             let candidate = try CraftyAPI(address: address, token: token)
             let response = try await candidate.request("GET", "servers")
-            self.servers = response.items.isEmpty ? response["servers"]?.items ?? [] : response.items
+            self.servers = await enrichedServers(response.items.isEmpty ? response["servers"]?.items ?? [] : response.items, api: candidate)
             self.api = candidate
             self.address = candidate.baseURL.absoluteString
             KeychainStore.save(address: self.address, token: token)
@@ -49,7 +49,7 @@ final class SessionStore: ObservableObject {
         guard let api else { return }
         do {
             let response = try await api.request("GET", "servers")
-            servers = response.items.isEmpty ? response["servers"]?.items ?? [] : response.items
+            servers = await enrichedServers(response.items.isEmpty ? response["servers"]?.items ?? [] : response.items, api: api)
             error = nil
         } catch { self.error = error.localizedDescription }
     }
@@ -60,6 +60,22 @@ final class SessionStore: ObservableObject {
         address = ""
         servers = []
         error = nil
+    }
+
+    private func enrichedServers(_ list: [JSONValue], api: CraftyAPI) async -> [JSONValue] {
+        await withTaskGroup(of: (Int, JSONValue).self) { group in
+            for (index, server) in list.enumerated() {
+                group.addTask {
+                    guard !server.serverID.isEmpty else { return (index, server) }
+                    guard let stats = try? await api.request("GET", "servers/\(server.serverID)/stats"),
+                          let running = stats["running"] else { return (index, server) }
+                    return (index, server.setting("running", to: .bool(running.boolean)))
+                }
+            }
+            var result = list
+            for await (index, value) in group { result[index] = value }
+            return result
+        }
     }
 }
 
